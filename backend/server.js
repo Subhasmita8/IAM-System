@@ -22,8 +22,9 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ─── CORS ─────────────────────────────────────────────────────
+import cors from "cors";
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001'],
+  origin: "https://iam-system.vercel.app",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
