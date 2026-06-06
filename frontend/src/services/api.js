@@ -5,7 +5,7 @@ import axios from 'axios';
 
 // ─── Base Instance ─────────────────────────────────────────────
 const api = axios.create({
-  baseURL:'http://localhost:5000',
+  baseURL: process.env.REACT_APP_API_URL,
   withCredentials: true,    // Send httpOnly cookies (for refresh token)
   timeout:         10000,
   headers: {
