@@ -21,7 +21,7 @@ class RefreshToken {
     const tokenHash = this.hash(rawToken);
     const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
     await pool.execute(
-      `INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_agent)
+      `INSERT INTO refresh_tokens (user_id, token, expires_at, ip_address, user_agent)
        VALUES (?, ?, ?, ?, ?)`,
       [userId, tokenHash, expiresAt, ipAddress || null, userAgent || null]
     );
@@ -35,7 +35,7 @@ class RefreshToken {
     const tokenHash = this.hash(rawToken);
     const [rows] = await pool.execute(
       `SELECT * FROM refresh_tokens
-       WHERE token_hash = ?
+       WHERE token = ?
          AND is_revoked = FALSE
          AND expires_at > NOW()
        LIMIT 1`,
@@ -48,7 +48,7 @@ class RefreshToken {
   static async revoke(rawToken) {
     const tokenHash = this.hash(rawToken);
     const [result] = await pool.execute(
-      `UPDATE refresh_tokens SET is_revoked = TRUE WHERE token_hash = ?`,
+      `UPDATE refresh_tokens SET is_revoked = TRUE WHERE token = ?`,
       [tokenHash]
     );
     return result.affectedRows > 0;
