@@ -33,5 +33,9 @@ IAM System/
 │
 └── schema.sql
 
+benchmark review
+Performed load testing on deployed IAM authentication APIs using Postman Collection Runner with 50+ iterations and analyzed response latency under repeated requests.
+
+
 👨‍💻 Author
 Subhasmita Prusty
