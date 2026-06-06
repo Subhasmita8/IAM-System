@@ -1,6 +1,6 @@
 // server.js
 // Express application entry point
-
+import cors from "cors";
 require('dotenv').config();
 
 const express      = require('express');
@@ -22,7 +22,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 // ─── CORS ─────────────────────────────────────────────────────
-import cors from "cors";
+
 app.use(cors({
   origin: "https://iam-system.vercel.app",
   credentials: true,
