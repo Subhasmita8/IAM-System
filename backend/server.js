@@ -23,11 +23,14 @@ app.set('trust proxy', 1);
 
 // ─── CORS ─────────────────────────────────────────────────────
 
+const allowedOrigins = [
+  'https://iam-system.vercel.app',
+  'http://localhost:3000'
+];
+
 app.use(cors({
-  origin: "https://iam-system.vercel.app",
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  origin: allowedOrigins,
+  credentials: true
 }));
 
 // ─── Body Parsing ─────────────────────────────────────────────
