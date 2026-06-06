@@ -1,0 +1,74 @@
+// models/RefreshToken.js
+// Data access layer for refresh_tokens table
+
+const { pool } = require('../config/db');
+const crypto = require('crypto');
+
+class RefreshToken {
+  /** Hash a raw token before storage or lookup (SHA-256 for fast lookup) */
+  static hash(rawToken) {
+    return crypto.createHash('sha256').update(rawToken).digest('hex');
+  }
+
+  /**
+   * Save a new refresh token for a user
+   * @param {number} userId
+   * @param {string} rawToken - The raw JWT refresh token
+   * @param {number} expiresInSeconds
+   * @param {object} meta - { ipAddress, userAgent }
+   */
+  static async save(userId, rawToken, expiresInSeconds, { ipAddress, userAgent } = {}) {
+    const tokenHash = this.hash(rawToken);
+    const expiresAt = new Date(Date.now() + expiresInSeconds * 1000);
+    await pool.execute(
+      `INSERT INTO refresh_tokens (user_id, token_hash, expires_at, ip_address, user_agent)
+       VALUES (?, ?, ?, ?, ?)`,
+      [userId, tokenHash, expiresAt, ipAddress || null, userAgent || null]
+    );
+  }
+
+  /**
+   * Find and validate a refresh token.
+   * Returns the token record if valid, null if not found/revoked/expired.
+   */
+  static async findValid(rawToken) {
+    const tokenHash = this.hash(rawToken);
+    const [rows] = await pool.execute(
+      `SELECT * FROM refresh_tokens
+       WHERE token_hash = ?
+         AND is_revoked = FALSE
+         AND expires_at > NOW()
+       LIMIT 1`,
+      [tokenHash]
+    );
+    return rows[0] || null;
+  }
+
+  /** Revoke a specific token (on logout or rotation) */
+  static async revoke(rawToken) {
+    const tokenHash = this.hash(rawToken);
+    const [result] = await pool.execute(
+      `UPDATE refresh_tokens SET is_revoked = TRUE WHERE token_hash = ?`,
+      [tokenHash]
+    );
+    return result.affectedRows > 0;
+  }
+
+  /** Revoke ALL tokens for a user (force-logout all devices) */
+  static async revokeAllForUser(userId) {
+    await pool.execute(
+      `UPDATE refresh_tokens SET is_revoked = TRUE WHERE user_id = ?`,
+      [userId]
+    );
+  }
+
+  /** Cleanup expired and revoked tokens (run as a cron job in production) */
+  static async cleanup() {
+    const [result] = await pool.execute(
+      `DELETE FROM refresh_tokens WHERE is_revoked = TRUE OR expires_at <= NOW()`
+    );
+    return result.affectedRows;
+  }
+}
+
+module.exports = RefreshToken;
