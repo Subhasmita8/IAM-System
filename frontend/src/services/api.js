@@ -5,7 +5,7 @@ import axios from 'axios';
 
 // ─── Base Instance ─────────────────────────────────────────────
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL,
+  baseURL: 'https://iam-backend-ep1y.onrender.com',
   withCredentials: true,    // Send httpOnly cookies (for refresh token)
   timeout:         10000,
   headers: {
