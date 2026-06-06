@@ -20,10 +20,14 @@ async function register(req, res, next) {
   try {
     const { username, email, password } = req.body;
 
+    console.log("REGISTER REQUEST:", { username, email }); // debug
+
     const result = await authService.register(
       { username, email, password },
       getClientMeta(req)
     );
+
+    console.log("REGISTER RESULT:", result); // debug
 
     // Store refresh token in httpOnly cookie
     setRefreshCookie(res, result.refreshToken);
@@ -32,12 +36,20 @@ async function register(req, res, next) {
       success: true,
       message: 'Registration successful',
       data: {
-        user:        result.user,
+        user: result.user,
         accessToken: result.accessToken,
       },
     });
+
   } catch (err) {
-    next(err);
+    // 🔥 THIS IS THE IMPORTANT PART
+    console.error("REGISTER ERROR FULL:", err);
+
+    return res.status(500).json({
+      success: false,
+      message: err.message || "Registration failed",
+      error: err   // optional (for deep debugging)
+    });
   }
 }
 
