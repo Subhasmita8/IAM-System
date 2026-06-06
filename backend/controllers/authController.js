@@ -46,25 +46,28 @@ async function register(req, res, next) {
  */
 async function login(req, res, next) {
   try {
-    const { email, password } = req.body;
+    console.log("LOGIN START");
 
     const result = await authService.login(
-      { email, password },
+      { email: req.body.email, password: req.body.password },
       getClientMeta(req)
     );
+
+    console.log("RESULT:", result);
 
     setRefreshCookie(res, result.refreshToken);
 
     return res.status(200).json({
       success: true,
-      message: 'Login successful',
-      data: {
-        user:        result.user,
-        accessToken: result.accessToken,
-      },
+      data: result
     });
+
   } catch (err) {
-    next(err);
+    console.error("LOGIN ERROR:", err);  // 👈 THIS IS KEY
+    return res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 }
 
