@@ -1,6 +1,5 @@
 // server.js
 // Express application entry point
-import cors from "cors";
 require('dotenv').config();
 
 const express      = require('express');
@@ -23,13 +22,8 @@ app.set('trust proxy', 1);
 
 // ─── CORS ─────────────────────────────────────────────────────
 
-const allowedOrigins = [
-  'https://iam-system.vercel.app',
-  'http://localhost:3000'
-];
-
 app.use(cors({
-  origin: allowedOrigins,
+  origin: 'https://iam-system.vercel.app',
   credentials: true
 }));
 
@@ -47,7 +41,7 @@ app.get('/health', (req, res) => {
 });
 
 // ─── API Routes ───────────────────────────────────────────────
-app.use('/auth',  authRoutes);
+app.use('/api/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/roles', roleRoutes);
 

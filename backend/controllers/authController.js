@@ -108,8 +108,11 @@ async function logout(req, res, next) {
     await authService.logout(token);
 
     // Clear the cookie
-    res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'strict' });
-
+    res.clearCookie('refreshToken', {
+     httpOnly: true,
+     secure: true,
+      sameSite: 'None',
+    });
     return res.status(200).json({
       success: true,
       message: 'Logged out successfully',
@@ -127,13 +130,13 @@ async function logout(req, res, next) {
  * sameSite: CSRF protection
  */
 function setRefreshCookie(res, token) {
-  const maxAgeMs = 7 * 24 * 60 * 60 * 1000; // 7 days
+  const maxAgeMs = 7 * 24 * 60 * 60 * 1000;
+
   res.cookie('refreshToken', token, {
     httpOnly: true,
-    secure:   process.env.NODE_ENV === 'production', // HTTPS only in prod
-    sameSite: 'strict',
-    maxAge:   maxAgeMs,
-    path:     '/auth/refresh-token', // Only sent to this path
+    secure: true,
+    sameSite: 'None',
+    maxAge: maxAgeMs,
   });
 }
 
