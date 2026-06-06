@@ -8,12 +8,13 @@ const cookieParser = require('cookie-parser');
 
 const { testConnection }           = require('./config/db');
 const { apiLimiter }               = require('./middleware/rateLimiter');
-const { errorHandler, notFound }   = require('./middleware/errorHandler');
 
 // Route modules
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const roleRoutes = require('./routes/roles');
+
+const { errorHandler, notFound }   = require('./middleware/errorHandler');
 
 const app = express();
 
